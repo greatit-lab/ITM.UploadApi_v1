@@ -19,7 +19,7 @@ namespace ITM.UploadApi.Controllers
         {
             // appsettings.json의 "SavePath"를 읽어옴. 없으면 기본값 사용.
             _baseStoragePath = configuration["AppSettings:SavePath"] ?? "/appdata/object_store";
-            
+
             // 허용 확장자 읽기
             var extSettings = configuration["AppSettings:AllowedExtensions"] ?? ".pdf,.jpg,.png";
             _allowedExtensions = extSettings.Split(',');
@@ -49,7 +49,7 @@ namespace ITM.UploadApi.Controllers
                 // 4. [핵심] 리눅스/윈도우 호환 경로 결합
                 // Path.Combine을 쓰면 리눅스에서는 '/'로, 윈도우에서는 '\'로 알아서 합쳐줍니다.
                 // 보안을 위해 파일명에서 경로 조작 문자(.., /) 제거
-                var safeFileName = Path.GetFileName(file.FileName); 
+                var safeFileName = Path.GetFileName(file.FileName);
                 var fullPath = Path.Combine(_baseStoragePath, safeFileName);
 
                 // 5. 파일 저장
@@ -58,11 +58,12 @@ namespace ITM.UploadApi.Controllers
                     await file.CopyToAsync(stream);
                 }
 
-                return Ok(new { 
-                    fileName = safeFileName, 
-                    path = fullPath, 
+                return Ok(new
+                {
+                    fileName = safeFileName,
+                    path = fullPath,
                     size = file.Length,
-                    message = "업로드 성공" 
+                    message = "업로드 성공"
                 });
             }
             catch (Exception ex)
