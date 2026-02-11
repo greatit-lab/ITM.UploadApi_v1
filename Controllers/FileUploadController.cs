@@ -21,7 +21,7 @@ namespace ITM.UploadApi.Controllers
         {
             // 1. 저장소 기본 경로 로드 (appsettings.json 또는 기본값)
             _baseStoragePath = configuration["AppSettings:SavePath"] ?? "/appdata/object_store";
-            
+
             // 2. 허용 확장자 설정
             var extSettings = configuration["AppSettings:AllowedExtensions"] ?? ".pdf,.jpg,.png,.txt";
             _allowedExtensions = extSettings.Split(',').Select(x => x.Trim().ToLower()).ToArray();
@@ -42,8 +42,8 @@ namespace ITM.UploadApi.Controllers
         /// </summary>
         [HttpPost("upload")]
         public async Task<IActionResult> Upload(
-            [FromForm] IFormFile file, 
-            [FromForm] string sdwt, 
+            [FromForm] IFormFile file,
+            [FromForm] string sdwt,
             [FromForm] string eqpid)
         {
             // 1. 파일 유효성 검사
@@ -109,9 +109,9 @@ namespace ITM.UploadApi.Controllers
                 // 리눅스 경로 구분자('/') 사용
                 var referenceAddress = $"/{sdwt}/{eqpid}/{dateFolder}/{uniqueFileName}";
 
-                return Ok(new 
-                { 
-                    message = "파일 업로드 및 분류 완료", 
+                return Ok(new
+                {
+                    message = "파일 업로드 및 분류 완료",
                     fileName = uniqueFileName,
                     path = finalFilePath,
                     referenceAddress = referenceAddress,
@@ -149,7 +149,7 @@ namespace ITM.UploadApi.Controllers
 
                 var fileBytes = System.IO.File.ReadAllBytes(fullPath);
                 var fileName = Path.GetFileName(fullPath);
-                
+
                 string contentType = "application/octet-stream";
                 if (fileName.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase)) contentType = "application/pdf";
                 else if (fileName.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase)) contentType = "image/jpeg";
