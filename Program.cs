@@ -32,7 +32,7 @@ app.UseCors("AllowAll");
 
 // (1) 설정 파일(appsettings.json)에서 경로 읽기. (못 읽으면 기본값 사용)
 var configPath = builder.Configuration["AppSettings:SavePath"];
-var finalStoragePath = string.IsNullOrWhiteSpace(configPath) 
+var finalStoragePath = string.IsNullOrWhiteSpace(configPath)
     ? "/appdata/object_store"  // 기본값
     : configPath;              // 설정값
 
@@ -55,7 +55,7 @@ if (!Directory.Exists(finalStoragePath))
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(Path.GetFullPath(finalStoragePath)),
-    RequestPath = "/files" // 예: http://서버IP:8082/files/이미지.jpg 로 접근 가능
+    RequestPath = "" // [수정] "/files"를 제거(빈 문자열)하여 http://서버IP:8082/SDWT/... 형태로 바로 접근 가능하게 함
 });
 
 // -----------------------------------------------------------------------------
