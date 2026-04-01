@@ -162,5 +162,49 @@ namespace ITM.UploadApi.Controllers
                 return StatusCode(500, $"다운로드 오류: {ex.Message}");
             }
         }
+
+        // =========================================================================
+        // [새로 추가된 API] Data API 서버 연동을 위한 파일 용량 측정 기능
+        // 요청: /api/FileUpload/size
+        // =========================================================================
+        /// <summary>
+        /// 오브젝트 스토리지(SavePath) 전체의 물리적 용량을 측정하여 바이트(Bytes)로 반환
+        /// </summary>
+        [HttpGet("size")]
+        public IActionResult GetStorageSize()
+        {
+            try
+            {
+                // 설정파일(_baseStoragePath = /appdata/object_store)이 실제로 존재하는지 확인
+                if (!Directory.Exists(_baseStoragePath))
+                {
+                    // 폴더가 비어있거나 없으면 용량은 0
+                    return Ok(new { success = true, sizeBytes = 0, message = "Directory not found or empty." });
+                }
+
+                long totalSizeBytes = 0;
+                var directoryInfo = new DirectoryInfo(_baseStoragePath);
+
+                // 하위 모든 폴더를 재귀적으로 돌며 파일 용량을 합산합니다 (리눅스 파일 시스템에서 안전하게 작동)
+                // SearchOption.AllDirectories 옵션을 사용하여 파일들의 Length(바이트)를 구합니다.
+                foreach (var file in directoryInfo.EnumerateFiles("*", SearchOption.AllDirectories))
+                {
+                    totalSizeBytes += file.Length;
+                }
+
+                // Data API(Node.js)가 정상적으로 수신할 JSON 포맷으로 리턴
+                return Ok(new { success = true, sizeBytes = totalSizeBytes });
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                // 리눅스 폴더 접근 권한(Permission) 문제 발생 시 Data API 쪽에 에러 상황을 명확히 전달
+                return StatusCode(500, new { success = false, sizeBytes = 0, message = $"Permission denied: {ex.Message}" });
+            }
+            catch (Exception ex)
+            {
+                // 예기치 못한 에러
+                return StatusCode(500, new { success = false, sizeBytes = 0, message = $"Storage calculation failed: {ex.Message}" });
+            }
+        }
     }
 }
