@@ -15,6 +15,9 @@ builder.Services.AddCors(options =>
         policy => policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 });
 
+// [추가됨] 백그라운드 스토리지 용량 계산 서비스 등록
+builder.Services.AddHostedService<ITM.UploadApi.Services.StorageSizeMonitorService>();
+
 var app = builder.Build();
 
 // 2. HTTP 파이프라인 설정
